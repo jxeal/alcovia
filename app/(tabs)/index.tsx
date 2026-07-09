@@ -1,18 +1,97 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/Colors';
+import React from "react";
+import { useEffect, useState } from "react";
+import { StyleSheet, View, ScrollView, RefreshControl } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Colors } from "@/constants/Colors";
+import { getStudent, getStats } from "@/src/services/student";
+import { Student, WeeklyStats } from "@/types/api";
+import Greeting from "@/src/components/dashboard/Greeting";
+import StatCard from "@/src/components/dashboard/StatCard";
+import WeeklyChart from "@/src/components/dashboard/WeeklyChart";
+import TodayProgress from "@/src/components/dashboard/ProgressCard";
+import StartSessionButton from "@/src/components/dashboard/StartSessionButton";
+import { router } from "expo-router";
 
 export default function DashboardScreen() {
+  const [student, setStudent] = useState<Student | null>(null);
+  const [stats, setStats] = useState<WeeklyStats | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function load() {
+    try {
+      const [studentData, statsData] = await Promise.all([
+        getStudent("stu_01"),
+        getStats("stu_01"),
+      ]);
+
+      setStudent(studentData);
+      setStats(statsData);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function onRefresh() {
+    setRefreshing(true);
+
+    await load();
+
+    setRefreshing(false);
+  }
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  if (!student || !stats) {
+    return <SafeAreaView style={styles.container} />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.placeholder}>
-        <Text style={styles.title}>Dashboard</Text>
-        <Text style={styles.subtitle}>Build this screen from the design spec.</Text>
-        <Text style={styles.hint}>
-          See the "Dashboard" section in the design reference.{'\n'}
-          This screen is FULLY SPECCED - match it exactly.
-        </Text>
-      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 24 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <Greeting name={student.name} initials={student.initials} />
+
+        <View style={styles.statsRow}>
+          <StatCard
+            icon="🎯"
+            value={stats.totalSessions}
+            label="Sessions"
+            backgroundColor={Colors.primaryLight}
+          />
+          <StatCard
+            icon="🪙"
+            value={student.totalCoins}
+            label="Coins"
+            backgroundColor={Colors.successLight}
+          />
+          <StatCard
+            icon="🔥"
+            value={student.currentStreak}
+            label="Day Streak"
+            backgroundColor={Colors.amberLight}
+          />
+        </View>
+
+        <WeeklyChart data={stats.sessionsPerDay} />
+
+        <TodayProgress
+          completed={stats.todayCompleted}
+          goal={stats.dailyGoal}
+        />
+
+        <StartSessionButton
+          onPress={() => {
+            router.push("/focus");
+          }}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -21,31 +100,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
-  placeholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  title: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 24,
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 16,
-    color: Colors.textSecondary,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  hint: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    color: Colors.textTertiary,
-    textAlign: 'center',
-    lineHeight: 22,
+  statsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 24,
   },
 });

@@ -15,8 +15,8 @@ initDb();
 // See API-SPEC.md for the full endpoint reference.
 //
 // Suggested structure:
-//   import studentRoutes from './routes/students';
-//   app.use('/api/students', studentRoutes);
+  import studentRoutes from './routes/students';
+  app.use('/api/students', studentRoutes);
 //
 // The database is already seeded with fixture data.
 // Run `npm run seed` if you need to reset it.

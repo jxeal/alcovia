@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import React from 'react';
 
 export default function TabLayout() {
   return (
@@ -45,7 +46,7 @@ export default function TabLayout() {
         options={{
           title: 'Achievements',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="star-outline" size={size} color={color} />
+            <Ionicons name="trophy" size={size} color={color} />
           ),
         }}
       />

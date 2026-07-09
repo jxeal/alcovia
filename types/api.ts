@@ -34,6 +34,12 @@ export interface SessionDetail {
   timeline: TimelineEntry[];
 }
 
+export interface CreateSessionRequest {
+  type: SessionType;
+  durationMs: number;
+  timeline: TimelineEntry[];
+}
+
 export interface TimelineEntry {
   type: 'focus' | 'break';
   durationMs: number;

@@ -29,6 +29,16 @@ export const Shadows = {
     shadowRadius: 14,
     elevation: 6,
   },
+  button: {
+    shadowColor: "#6C5CE7",
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 5,
+  },
 } as const;
 
 export const Radii = {
